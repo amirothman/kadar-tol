@@ -10,6 +10,16 @@ def extract_content(driver):
     tbody = driver.find_element_by_tag_name("tbody")
     return tbody.text
 
+def iterate_combo_box(id_name="MainContent_ASPxComboBox3"):
+    third_box = driver.find_element_by_id(id_name)
+    third_options = [(third_option.get_attribute("value"),third_option.text) for third_option in third_box.find_elements_by_tag_name("option")]
+
+    for third_option,third_label in third_options:
+        third_box = driver.find_element_by_id(id_name)
+        select_third_box = Select(third_box)
+        select_third_box.select_by_value(third_option)
+        print(third_label,extract_content(driver))
+
 try:
     driver = webdriver.Chrome('./chromedriver')
     driver.get("http://kadartol.llm.gov.my/Default.aspx")
@@ -31,15 +41,15 @@ try:
                     second_box = driver.find_element_by_id("MainContent_ASPxComboBox2")
                     select_second_box = Select(second_box)
                     select_second_box.select_by_value(second_option)
-                    third_box = driver.find_element_by_id("MainContent_ASPxComboBox3")
-                    third_options = [(third_option.get_attribute("value"),third_option.text) for third_option in third_box.find_elements_by_tag_name("option")]
-
-                    for third_option,third_label in third_options:
-                        third_box = driver.find_element_by_id("MainContent_ASPxComboBox3")
-                        select_third_box = Select(third_box)
-                        select_third_box.select_by_value(third_option)
-                        print(label,second_label,third_label)
-                        print(extract_content(driver))
+                    # third_box = driver.find_element_by_id("MainContent_ASPxComboBox3")
+                    # third_options = [(third_option.get_attribute("value"),third_option.text) for third_option in third_box.find_elements_by_tag_name("option")]
+                    #
+                    # for third_option,third_label in third_options:
+                    #     third_box = driver.find_element_by_id("MainContent_ASPxComboBox3")
+                    #     select_third_box = Select(third_box)
+                    #     select_third_box.select_by_value(third_option)
+                    #     print(label,second_label,third_label)
+                    #     print(extract_content(driver))
             except EC.NoSuchElementException:
                 try:
                     second_box = driver.find_element_by_id("MainContent_ASPxComboBox2")
