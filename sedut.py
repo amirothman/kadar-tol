@@ -3,6 +3,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC # available since 2.26.0
 from selenium.webdriver.common.keys import Keys
+import json
+import re
 
 def extract_content(driver):
     tbody = driver.find_element_by_tag_name("tbody")
@@ -18,6 +20,21 @@ def iterate_combo_box(driver,id_name):
         select_box.select_by_value(option)
         yield (label,extract_content(driver))
 
+def normalize_name(l):
+    joined = " ".join(l)
+    cleaned = re.sub(r"[^A-Za-z]","_",joined)
+    lowered = cleaned.lower()
+    return lowered
+
+def produce_json(label,second_label,third_label,l,content):
+    json_dict = {
+                    "normalized_name":normalized_name(l),
+                    "lebuhraya":label,
+                    "masuk":second_label,
+                    "keluar":third_label,
+                    "raw_text":content
+                }
+    return json_dict
 try:
     driver = webdriver.Chrome('./chromedriver')
     driver.get("http://kadartol.llm.gov.my/Default.aspx")
@@ -33,22 +50,31 @@ try:
             try:
                 for second_label,_ in iterate_combo_box(driver,"MainContent_ASPxComboBox2"):
                     for third_label,content in iterate_combo_box(driver,"MainContent_ASPxComboBox3"):
-                        print(label,second_label,third_label,content)
+                        j = produce_json(label,second_label,third_label,l,content)
+                        print(j)
+                        json.dump(j,open("json/{}.json".format(j["normalized_name"])))
+
             except EC.NoSuchElementException:
                 try:
                     for second_label,content in iterate_combo_box(driver,"MainContent_ASPxComboBox2"):
-                        print(label,second_label,content)
+                        j = produce_json(label,second_label,None,l,content)
+                        print(j)
+                        json.dump(j,open("json/{}.json".format(j["normalized_name"])))
                 except EC.NoSuchElementException:
                     pass
         except EC.NoSuchElementException:
             try:
                 for second_label,content in iterate_combo_box(driver,"MainContent_ASPxComboBox2"):
-                    print(label,second_label,content)
+                    j = produce_json(label,second_label,None,l,content)
+                    print(j)
+                    json.dump(j,open("json/{}.json".format(j["normalized_name"])))
                 kembali = driver.find_element_by_id("MainContent_Button2")
                 kembali.click()
             except EC.NoSuchElementException:
                 for second_label,content in iterate_combo_box(driver,"MainContent_ASPxComboBox2"):
-                    print(label,second_label,content)
+                    j = produce_json(label,second_label,None,l,content)
+                    print(j)
+                    json.dump(j,open("json/{}.json".format(j["normalized_name"])))
                 kembali = driver.find_element_by_id("MainContent_Button1")
                 kembali.click()
 finally:
