@@ -4,21 +4,19 @@ from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC # available since 2.26.0
 from selenium.webdriver.common.keys import Keys
 
-import time
-
 def extract_content(driver):
     tbody = driver.find_element_by_tag_name("tbody")
     return tbody.text
 
-def iterate_combo_box(id_name="MainContent_ASPxComboBox3"):
-    third_box = driver.find_element_by_id(id_name)
-    third_options = [(third_option.get_attribute("value"),third_option.text) for third_option in third_box.find_elements_by_tag_name("option")]
+def iterate_combo_box(driver,id_name):
+    box = driver.find_element_by_id(id_name)
+    options = [(option.get_attribute("value"),option.text) for option in box.find_elements_by_tag_name("option")]
 
-    for third_option,third_label in third_options:
-        third_box = driver.find_element_by_id(id_name)
-        select_third_box = Select(third_box)
-        select_third_box.select_by_value(third_option)
-        print(third_label,extract_content(driver))
+    for option,label in options:
+        box = driver.find_element_by_id(id_name)
+        select_box = Select(box)
+        select_box.select_by_value(option)
+        yield (label,extract_content(driver))
 
 try:
     driver = webdriver.Chrome('./chromedriver')
@@ -33,56 +31,24 @@ try:
             selected_box = Select(box)
             selected_box.select_by_value(option)
             try:
-                third_box = driver.find_element_by_id("MainContent_ASPxComboBox3")
-                second_box = driver.find_element_by_id("MainContent_ASPxComboBox2")
-                second_options = [(second_option.get_attribute("value"),second_option.text) for second_option in second_box.find_elements_by_tag_name("option")]
-                for second_option,second_label in second_options:
-                    # print(second_option,second_label)
-                    second_box = driver.find_element_by_id("MainContent_ASPxComboBox2")
-                    select_second_box = Select(second_box)
-                    select_second_box.select_by_value(second_option)
-                    # third_box = driver.find_element_by_id("MainContent_ASPxComboBox3")
-                    # third_options = [(third_option.get_attribute("value"),third_option.text) for third_option in third_box.find_elements_by_tag_name("option")]
-                    #
-                    # for third_option,third_label in third_options:
-                    #     third_box = driver.find_element_by_id("MainContent_ASPxComboBox3")
-                    #     select_third_box = Select(third_box)
-                    #     select_third_box.select_by_value(third_option)
-                    #     print(label,second_label,third_label)
-                    #     print(extract_content(driver))
+                for second_label,_ in iterate_combo_box(driver,"MainContent_ASPxComboBox2"):
+                    for third_label,content in iterate_combo_box(driver,"MainContent_ASPxComboBox3"):
+                        print(label,second_label,third_label,content)
             except EC.NoSuchElementException:
                 try:
-                    second_box = driver.find_element_by_id("MainContent_ASPxComboBox2")
-                    second_options = [(second_option.get_attribute("value"),second_option.text) for second_option in second_box.find_elements_by_tag_name("option")]
-                    for second_option,second_label in second_options:
-                        second_box = driver.find_element_by_id("MainContent_ASPxComboBox2")
-                        select_second_box = Select(second_box)
-                        select_second_box.select_by_value(second_option)
-                        print(label,second_label)
-                        print(extract_content(driver))
+                    for second_label,content in iterate_combo_box(driver,"MainContent_ASPxComboBox2"):
+                        print(label,second_label,content)
                 except EC.NoSuchElementException:
                     pass
         except EC.NoSuchElementException:
             try:
-                second_box = driver.find_element_by_id("MainContent_ASPxComboBox2")
-                second_options = [(second_option.get_attribute("value"),second_option.text) for second_option in second_box.find_elements_by_tag_name("option")]
-                for second_option,second_label in second_options:
-                    second_box = driver.find_element_by_id("MainContent_ASPxComboBox2")
-                    select_second_box = Select(second_box)
-                    select_second_box.select_by_value(second_option)
-                    print(label,second_label)
-                    print(extract_content(driver))
+                for second_label,content in iterate_combo_box(driver,"MainContent_ASPxComboBox2"):
+                    print(label,second_label,content)
                 kembali = driver.find_element_by_id("MainContent_Button2")
                 kembali.click()
             except EC.NoSuchElementException:
-                second_box = driver.find_element_by_id("MainContent_ASPxComboBox2")
-                second_options = [(second_option.get_attribute("value"),second_option.text) for second_option in second_box.find_elements_by_tag_name("option")]
-                for second_option,second_label in second_options:
-                    second_box = driver.find_element_by_id("MainContent_ASPxComboBox2")
-                    select_second_box = Select(second_box)
-                    select_second_box.select_by_value(second_option)
-                    print(label,second_label)
-                    print(extract_content(driver))
+                for second_label,content in iterate_combo_box(driver,"MainContent_ASPxComboBox2"):
+                    print(label,second_label,content)
                 kembali = driver.find_element_by_id("MainContent_Button1")
                 kembali.click()
 finally:
