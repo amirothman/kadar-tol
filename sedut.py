@@ -28,7 +28,7 @@ def normalize_name(l):
 
 def produce_json(label,second_label,third_label,l,content):
     json_dict = {
-                    "normalized_name":normalized_name(l),
+                    "normalized_name":normalize_name(l),
                     "lebuhraya":label,
                     "masuk":second_label,
                     "keluar":third_label,
@@ -50,31 +50,31 @@ try:
             try:
                 for second_label,_ in iterate_combo_box(driver,"MainContent_ASPxComboBox2"):
                     for third_label,content in iterate_combo_box(driver,"MainContent_ASPxComboBox3"):
-                        j = produce_json(label,second_label,third_label,l,content)
+                        j = produce_json(label,second_label,third_label,[label,second_label,third_label],content)
                         print(j)
-                        json.dump(j,open("json/{}.json".format(j["normalized_name"])))
+                        json.dump(j,open("./json/{}.json".format(j["normalized_name"]),"w"))
 
             except EC.NoSuchElementException:
                 try:
                     for second_label,content in iterate_combo_box(driver,"MainContent_ASPxComboBox2"):
-                        j = produce_json(label,second_label,None,l,content)
+                        j = produce_json(label,second_label,None,[label,second_label],content)
                         print(j)
-                        json.dump(j,open("json/{}.json".format(j["normalized_name"])))
+                        json.dump(j,open("./json/{}.json".format(j["normalized_name"]),"w"))
                 except EC.NoSuchElementException:
                     pass
         except EC.NoSuchElementException:
             try:
                 for second_label,content in iterate_combo_box(driver,"MainContent_ASPxComboBox2"):
-                    j = produce_json(label,second_label,None,l,content)
+                    j = produce_json(label,second_label,None,[label,second_label],content)
                     print(j)
-                    json.dump(j,open("json/{}.json".format(j["normalized_name"])))
+                    json.dump(j,open("./json/{}.json".format(j["normalized_name"]),"w"))
                 kembali = driver.find_element_by_id("MainContent_Button2")
                 kembali.click()
             except EC.NoSuchElementException:
                 for second_label,content in iterate_combo_box(driver,"MainContent_ASPxComboBox2"):
-                    j = produce_json(label,second_label,None,l,content)
+                    j = produce_json(label,second_label,None,[label,second_label],content)
                     print(j)
-                    json.dump(j,open("json/{}.json".format(j["normalized_name"])))
+                    json.dump(j,open("./json/{}.json".format(j["normalized_name"]),"w"))
                 kembali = driver.find_element_by_id("MainContent_Button1")
                 kembali.click()
 finally:
